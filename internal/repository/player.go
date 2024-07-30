@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/Anna-Laura1811/RPG_GO_BD/internal/entity"
+	"github.com/Anna-Laura1811/Aula_03/internal/entity"
 )
 
 type PlayerRepository struct {

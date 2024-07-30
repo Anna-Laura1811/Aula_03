@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Anna-Laura1811/RPG_GO_BD/internal/entity"
-	repository "github.com/Anna-Laura1811/RPG_GO_BD/internal/repositoy"
+	"github.com/Anna-Laura1811/Aula_03/internal/entity"
+	repository "github.com/Anna-Laura1811/Aula_03/internal/repositoy"
 )
 
 type EnemyService struct {

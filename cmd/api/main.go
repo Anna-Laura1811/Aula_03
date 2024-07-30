@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Anna-Laura1811/RPG_GO_BD/internal/handler"
-	repository 	"github.com/Anna-Laura1811/RPG_GO_BD/internal/repositoy"
-	"github.com/Anna-Laura1811/RPG_GO_BD/internal/service"
+	"github.com/Anna-Laura1811/Aula_03/internal/handler"
+	"github.com/Anna-Laura1811/Aula_03/internal/repository"
+	"github.com/Anna-Laura1811/Aula_03internal/service"
 	_ "github.com/lib/pq"
 )
 

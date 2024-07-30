@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 
-	"github.com/Anna-Laura1811/RPG_GO_BD/internal/service"
+	"github.com/Anna-Laura1811/Aula_03/internal/service"
 )
 
 type BattleRepository struct {

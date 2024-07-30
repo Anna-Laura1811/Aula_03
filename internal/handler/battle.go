@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Anna-Laura1811/RPG_GO_BD/internal/service"
-
+	"github.com/Anna-Laura1811/Aula_03/internal/service"
+)
 type BattleHandler struct {
 	BattleService *service.BattleService
 }
