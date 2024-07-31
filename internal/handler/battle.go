@@ -3,9 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/Anna-Laura1811/Aula_03/internal/service"
+    "RPG_AULA03/internal/service"
 )
+
 type BattleHandler struct {
 	BattleService *service.BattleService
 }
@@ -51,22 +51,3 @@ func (bh *BattleHandler) LoadBattles(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(battles)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

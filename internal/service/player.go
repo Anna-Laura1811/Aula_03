@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Anna-Laura1811/Aula_03/internal/entity"
-	repository "github.com/Anna-Laura1811/Aula_03/internal/repositoy"
+	"RPG_AULA03/internal/entity"
+	"RPG_AULA03/internal/repository"
 )
 
 type PlayerService struct {

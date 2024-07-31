@@ -2,67 +2,89 @@ package service
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/Anna-Laura1811/Aula_03/internal/entity"
-	repository "github.com/Anna-Laura1811/Aula_03/internal/service"
+
+	"RPG_AULA03/internal/entity"
+	"RPG_AULA03/internal/repository"
 )
 
 type BattleService struct {
 	PlayerRepository repository.PlayerRepository
 	EnemyRepository  repository.EnemyRepository
+	BattleRepository repository.BattleRepository
 }
 
-func NewBattleService(playerRepo repository.PlayerRepository, enemyRepo repository.EnemyRepository) *BattleService {
+func NewBattleService(playerRepo repository.PlayerRepository, enemyRepo repository.EnemyRepository, battleRepo repository.BattleRepository) *BattleService {
 	return &BattleService{
 		PlayerRepository: playerRepo,
 		EnemyRepository:  enemyRepo,
+		BattleRepository: battleRepo,
 	}
 }
 
-func (bs *BattleService) Battle(playerID, enemyID string, diceThrown int) (*entity.BattleResult, error) {
-	player, err := bs.PlayerRepository.LoadPlayerById(playerID)
-	if err != nil {
-		fmt.Println(err)
-		return nil, errors.New("internal server error")
-	}
-	if player == nil {
-		return nil, errors.New("player id not found")
+func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*entity.Battle, error) {
+	player, err := bs.PlayerRepository.LoadPlayerByNickname(playerNickname)
+	if err != nil || player == nil {
+		return nil, errors.New("player not found")
 	}
 
-	enemy, err := bs.EnemyRepository.LoadEnemyById(enemyID)
-	if err != nil {
-		fmt.Println(err)
-		return nil, errors.New("internal server error")
-	}
-	if enemy == nil {
-		return nil, errors.New("enemy id not found")
+	enemy, err := bs.EnemyRepository.LoadEnemyByNickname(enemyNickname)
+	if err != nil || enemy == nil {
+		return nil, errors.New("enemy not found")
 	}
 
-	playerAttack := player.Attack + diceThrown
-	enemyAttack := enemy.Attack + diceThrown
+	if player.Life <= 0 || enemy.Life <= 0 {
+		return nil, errors.New("both player and enemy must have life > 0 to battle")
+	}
 
-	player.Life -= enemyAttack
-	enemy.Life -= playerAttack
+	battle := entity.NewBattle(player.ID, enemy.ID, player.Nickname, enemy.Nickname)
+	dice := battle.DiceThrown
 
-	var winner string
-	if player.Life > 0 && enemy.Life <= 0 {
-		winner = "player"
-	} else if enemy.Life > 0 && player.Life <= 0 {
-		winner = "enemy"
+	if dice <= 3 {
+		player.Life -= enemy.Attack
+		if player.Life < 0 {
+			player.Life = 0
+		}
+		if err := bs.PlayerRepository.SavePlayer(player.ID, player); err != nil {
+			return nil, errors.New("failed to update player life")
+		}
+		battle.Result = "Enemy won"
 	} else {
-		winner = "draw"
+		enemy.Life -= player.Attack
+		if enemy.Life < 0 {
+			enemy.Life = 0
+		}
+		if err := bs.EnemyRepository.SaveEnemy(enemy.ID, enemy); err != nil {
+			return nil, errors.New("failed to update enemy life")
+		}
+		battle.Result = "Player won"
 	}
 
-	result := &entity.BattleResult{
-		PlayerID:    player.ID,
-		EnemyID:     enemy.ID,
-		Winner:      winner,
-		PlayerLife:  player.Life,
-		EnemyLife:   enemy.Life,
-		PlayerAttack: playerAttack,
-		EnemyAttack:  enemyAttack,
+	if _, err := bs.BattleRepository.AddBattle(battle); err != nil {
+		return nil, err
 	}
 
-	return result, nil
+	return battle, nil
 }
+
+func (bs *BattleService) LoadBattles() ([]*entity.Battle, error) {
+	return bs.BattleRepository.LoadBattles()
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

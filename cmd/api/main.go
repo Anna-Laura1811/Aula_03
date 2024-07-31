@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Anna-Laura1811/Aula_03/internal/handler"
-	"github.com/Anna-Laura1811/Aula_03/internal/repository"
-	"github.com/Anna-Laura1811/Aula_03internal/service"
+	"RPG_AULA03/internal/handler"
+	"RPG_AULA03/internal/repository"
+	"RPG_AULA03/internal/service"
 	_ "github.com/lib/pq"
 )
 
@@ -43,11 +43,8 @@ func main() {
 	mux.HandleFunc("DELETE /enemy/{id}", enemyHandler.DeleteEnemy)
 	mux.HandleFunc("GET /enemy/{id}", enemyHandler.LoadEnemy)
 	mux.HandleFunc("PUT /enemy/{id}", enemyHandler.SaveEnemy)
-	mux.HandleFunc("POST /battle", battleHandler.AddBattle)
-	mux.HandleFunc("GET /battle", battleHandler.LoadBatlle)
-	mux.HandleFunc("DELETE /battle/{id}", battleHandler.DeleteBattle)
-	mux.HandleFunc("GET /battle/{id}", battleHandler.LoadBattle)
-	mux.HandleFunc("PUT /battle/{id}", battleHandler.SaveBattle)
+	mux.HandleFunc("POST /battle", battleHandler.CreateBattle)
+	mux.HandleFunc("GET /battle", battleHandler.LoadBattles)
 
 
 	fmt.Println("Server is running on port 8080")

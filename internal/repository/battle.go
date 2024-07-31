@@ -1,9 +1,8 @@
 package repository
 
 import (
+	"RPG_AULA03/internal/entity"
 	"database/sql"
-
-	"github.com/Anna-Laura1811/Aula_03/internal/service"
 )
 
 type BattleRepository struct {
@@ -40,20 +39,3 @@ func (br *BattleRepository) LoadBattles() ([]*entity.Battle, error) {
 	}
 	return battles, nil
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

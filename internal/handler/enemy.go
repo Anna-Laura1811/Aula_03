@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Anna-Laura1811/Aula_03/internal/entity"
-	"github.com/Anna-Laura1811/Aula_03/internal/service"
+	"RPG_AULA03/internal/entity"
+	"RPG_AULA03/internal/service"
 )
 
 type EnemyHandler struct {
