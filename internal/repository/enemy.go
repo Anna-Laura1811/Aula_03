@@ -80,5 +80,4 @@ func (er *EnemyRepository) SaveEnemy(id string, enemy *entity.Enemy) error {
 	}
 	return nil
 }
-
 // olhar

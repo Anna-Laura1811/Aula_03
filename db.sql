@@ -5,7 +5,7 @@ CREATE TABLE Player (
     Nickname VARCHAR(255) NOT NULL,
     Life INT NOT NULL,
     Attack INT NOT NULL,
-    DEFESA INT NOT NULL
+    Defesa INT NOT NULL
 );
 
 CREATE TABLE Enemy (

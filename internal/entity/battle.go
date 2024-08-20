@@ -17,8 +17,6 @@ type Battle struct {
 	Result     string `json:"result"`
 }
 
-
-
 func NewBattle(playerID, enemyID, playerName, enemyName string) *Battle {
 	rand.Seed(time.Now().UnixNano())
 	return &Battle{
@@ -30,7 +28,6 @@ func NewBattle(playerID, enemyID, playerName, enemyName string) *Battle {
 		DiceThrown: rand.Intn(6) + 1,
 	}
 }
-
 
 
 
