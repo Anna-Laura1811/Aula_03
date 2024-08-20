@@ -1,4 +1,4 @@
--- CREATE DATABASE go-simple-rpg-api
+-- CREATE DATABASE
 
 CREATE TABLE Player (
     ID UUID PRIMARY KEY,
