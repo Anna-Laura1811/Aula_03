@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 
 	"RPG_AULA03/internal/entity"
 	"RPG_AULA03/internal/repository"
@@ -16,17 +17,20 @@ func NewEnemyService(EnemyRepository repository.EnemyRepository) *EnemyService {
 	return &EnemyService{EnemyRepository: EnemyRepository}
 }
 
-func (es *EnemyService) AddEnemy(nickname string, life, attack, defesa int) (*entity.Enemy, error) {
-	if nickname == "" || life == 0 || attack == 0 || defesa == 0{
-		return nil, errors.New("enemy nickname, life, attack and defesa is required")
+func (es *EnemyService) AddEnemy(nickname string, life, attack, defense, heal int) (*entity.Enemy, error) {
+	// Verificações de validação
+	if nickname == "" || life == 0 || attack == 0 || defense == 0 || heal == 0 {
+		return nil, errors.New("enemy nickname, life, attack, defense and heal are required")
 	}
 
 	if len(nickname) > 255 {
 		return nil, errors.New("enemy nickname cannot exceed 255 characters")
 	}
-    if defesa > 10 || defesa <= 0{
-		return nil, errors.New("enemy defesa must be between 1 and 10")
+
+	if defense > 10 || defense <= 0 {
+		return nil, errors.New("enemy defense must be between 1 and 10")
 	}
+
 	if attack > 10 || attack <= 0 {
 		return nil, errors.New("enemy attack must be between 1 and 10")
 	}
@@ -35,6 +39,11 @@ func (es *EnemyService) AddEnemy(nickname string, life, attack, defesa int) (*en
 		return nil, errors.New("enemy life must be between 1 and 100")
 	}
 
+	if heal > 10 || heal <= 0 {
+		return nil, errors.New("enemy heal must be between 1 and 10")
+	}
+
+	// Verificar se o inimigo já existe pelo nickname
 	enemy, err := es.EnemyRepository.LoadEnemyByNickname(nickname)
 	if err != nil {
 		fmt.Println(err)
@@ -44,7 +53,8 @@ func (es *EnemyService) AddEnemy(nickname string, life, attack, defesa int) (*en
 		return nil, errors.New("enemy nickname already exists")
 	}
 
-	enemy = entity.NewEnemy(nickname, life, attack, defesa)
+	// Criar e salvar o inimigo
+	enemy = entity.NewEnemy(nickname, life, attack, defense, heal) // Inclua heal aqui
 	if _, err := es.EnemyRepository.AddEnemy(enemy); err != nil {
 		fmt.Println(err)
 		return nil, errors.New("internal server error")
@@ -94,7 +104,7 @@ func (es *EnemyService) LoadEnemy(id string) (*entity.Enemy, error) {
 	return enemy, nil
 }
 
-func (es *EnemyService) SaveEnemy(id, nickname string, life, attack, defesa int) (*entity.Enemy, error) {
+func (es *EnemyService) SaveEnemy(id, nickname string, life, attack, defense, heal int) (*entity.Enemy, error) {
 	enemy, err := es.EnemyRepository.LoadEnemyById(id)
 
 	if err != nil {
@@ -126,11 +136,11 @@ func (es *EnemyService) SaveEnemy(id, nickname string, life, attack, defesa int)
 		}
 		enemy.Attack = attack
 	}
-	if defesa != 0 && defesa != enemy.Defesa {
-		if defesa > 10 || defesa <= 0 {
-			return nil, errors.New("enemy defesa must be between 1 and 10")
+	if defense != 0 && defense != enemy.Defense {
+		if defense > 10 || defense <= 0 {
+			return nil, errors.New("enemy defense must be between 1 and 10")
 		}
-		enemy.Defesa = defesa
+		enemy.Defense = defense
 	}
 
 	if life != 0 && life != enemy.Life {
@@ -140,9 +150,39 @@ func (es *EnemyService) SaveEnemy(id, nickname string, life, attack, defesa int)
 		enemy.Life = life
 	}
 
+	if heal != 0 && heal != enemy.Heal {
+		if heal > 5 || heal <= 0 {
+			return nil, errors.New("enemy heal must be between 1 and 10")
+		}
+		enemy.Heal = heal
+	}
+
 	if err := es.EnemyRepository.SaveEnemy(id, enemy); err != nil {
 		fmt.Println(err)
 		return nil, errors.New("internal server error")
 	}
+	return enemy, nil
+}
+
+// Método para curar o inimigo
+func (es *EnemyService) HealEnemy(id string) (*entity.Enemy, error) {
+	enemy, err := es.LoadEnemy(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Determinar a quantidade de cura (por exemplo, um valor aleatório entre 1 e 10)
+	healAmount := rand.Intn(10) + 1
+	enemy.Life += healAmount
+
+	// Garantir que a vida do inimigo não exceda o máximo de 100
+	if enemy.Life > 100 {
+		enemy.Life = 100
+	}
+
+	if err := es.EnemyRepository.SaveEnemy(enemy.ID, enemy); err != nil {
+		return nil, errors.New("falha ao atualizar a vida do inimigo após a cura")
+	}
+
 	return enemy, nil
 }

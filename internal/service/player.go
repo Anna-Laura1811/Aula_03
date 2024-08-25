@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 
 	"RPG_AULA03/internal/entity"
 	"RPG_AULA03/internal/repository"
@@ -16,44 +17,6 @@ func NewPlayerService(PlayerRepository repository.PlayerRepository) *PlayerServi
 	return &PlayerService{PlayerRepository: PlayerRepository}
 }
 
-func (ps *PlayerService) AddPlayer(nickname string, life, attack, defesa int) (*entity.Player, error) {
-	if nickname == "" || life == 0 || attack == 0 || defesa == 0 {
-		return nil, errors.New("player nickname, life and attack is required")
-	}
-
-	if len(nickname) > 255 {
-		return nil, errors.New("player nickname cannot exceed 255 characters")
-	}
-
-	if attack > 10 || attack <= 0 {
-		return nil, errors.New("player attack must be between 1 and 10")
-	}
-
-	
-	if defesa > 10 || defesa <= 0 {
-		return nil, errors.New("player defesa must be between 1 and 10")
-	}
-
-	if life > 100 || life <= 0 {
-		return nil, errors.New("player life must be between 1 and 100")
-	}
-
-	player, err := ps.PlayerRepository.LoadPlayerByNickname(nickname)
-	if err != nil {
-		fmt.Println(err)
-		return nil, errors.New("internal server error")
-	}
-	if player != nil {
-		return nil, errors.New("player nickname already exits")
-	}
-
-	player = entity.NewPlayer(nickname, life, attack, defesa )
-	if _, err := ps.PlayerRepository.AddPlayer(player); err != nil {
-		fmt.Println(err)
-		return nil, errors.New("internal server error")
-	}
-	return player, nil
-}
 
 func (ps *PlayerService) LoadPlayers() ([]*entity.Player, error) {
 	players, err := ps.PlayerRepository.LoadPlayers()
@@ -83,6 +46,51 @@ func (ps *PlayerService) DeletePlayer(id string) error {
 	}
 	return nil
 }
+func (ps *PlayerService) AddPlayer(nickname string, life, attack, defense, heal int) (*entity.Player, error) {
+    // Checa se os parâmetros são válidos
+    if nickname == "" || life == 0 || attack == 0 || defense == 0 || heal == 0 {
+        return nil, errors.New("player nickname, life, attack, defense, and heal are required")
+    }
+
+    // Validações
+    if len(nickname) > 255 {
+        return nil, errors.New("player nickname cannot exceed 255 characters")
+    }
+
+    if attack > 10 || attack <= 0 {
+        return nil, errors.New("player attack must be between 1 and 10")
+    }
+
+    if defense > 10 || defense <= 0 {
+        return nil, errors.New("player defense must be between 1 and 10")
+    }
+
+    if life > 100 || life <= 0 {
+        return nil, errors.New("player life must be between 1 and 100")
+    }
+
+    if heal > 5 || heal <= 0 {
+        return nil, errors.New("player heal must be between 1 and 10")
+    }
+
+    player, err := ps.PlayerRepository.LoadPlayerByNickname(nickname)
+    if err != nil {
+        fmt.Println(err)
+        return nil, errors.New("internal server error")
+    }
+    if player != nil {
+        return nil, errors.New("player nickname already exists")
+    }
+
+    // Corrige a chamada para `NewPlayer`
+    player = entity.NewPlayer(nickname, life, attack, defense, heal)
+    if _, err := ps.PlayerRepository.AddPlayer(player); err != nil {
+        fmt.Println(err)
+        return nil, errors.New("internal server error")
+    }
+    return player, nil
+}
+
 
 func (ps *PlayerService) LoadPlayer(id string) (*entity.Player, error) {
 	player, err := ps.PlayerRepository.LoadPlayerById(id)
@@ -97,7 +105,7 @@ func (ps *PlayerService) LoadPlayer(id string) (*entity.Player, error) {
 	return player, nil
 }
 
-func (ps *PlayerService) SavePlayer(id, nickname string, life, attack, defesa int) (*entity.Player, error) {
+func (ps *PlayerService) SavePlayer(id, nickname string, life, attack, defense int) (*entity.Player, error) {
 	player, err := ps.PlayerRepository.LoadPlayerById(id)
 
 	if err != nil {
@@ -115,7 +123,7 @@ func (ps *PlayerService) SavePlayer(id, nickname string, life, attack, defesa in
 			return nil, errors.New("internal server error")
 		}
 		if hasNickname != nil {
-			return nil, errors.New("player nickname already exits")
+			return nil, errors.New("player nickname already exists")
 		}
 		if len(nickname) > 255 {
 			return nil, errors.New("player nickname cannot exceed 255 characters")
@@ -129,11 +137,12 @@ func (ps *PlayerService) SavePlayer(id, nickname string, life, attack, defesa in
 		}
 		player.Attack = attack
 	}
-	if defesa != 0 && defesa != player.Defesa {
-		if defesa > 10 || defesa  <= 0 {
-			return nil, errors.New("player attack must be between 1 and 10")
+
+	if defense != 0 && defense != player.Defense {
+		if defense > 10 || defense <= 0 {
+			return nil, errors.New("player defense must be between 1 and 10")
 		}
-		player.Defesa = defesa
+		player.Defense = defense
 	}
 
 	if life != 0 && life != player.Life {
@@ -147,5 +156,28 @@ func (ps *PlayerService) SavePlayer(id, nickname string, life, attack, defesa in
 		fmt.Println(err)
 		return nil, errors.New("internal server error")
 	}
+	return player, nil
+}
+
+// Método para curar o jogador
+func (ps *PlayerService) HealPlayer(id string) (*entity.Player, error) {
+	player, err := ps.LoadPlayer(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Determinar a quantidade de cura (ex.: valor aleatório entre 1 e 10)
+	healAmount := rand.Intn(10) + 1
+	player.Life += healAmount
+
+	// Garantir que a vida do jogador não exceda o máximo de 100
+	if player.Life > 100 {
+		player.Life = 100
+	}
+
+	if err := ps.PlayerRepository.SavePlayer(player.ID, player); err != nil {
+		return nil, errors.New("falha ao atualizar a vida do jogador após a cura")
+	}
+
 	return player, nil
 }

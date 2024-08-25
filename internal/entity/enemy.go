@@ -7,15 +7,23 @@ type Enemy struct {
 	Nickname string
 	Life     int
 	Attack   int
-	Defesa   int
+	Defense  int
+	Heal     int // Novo atributo para cura
 }
 
-func NewEnemy(nickname string, life, attack, defesa int) *Enemy {
+func NewEnemy(nickname string, life, attack, defense, heal int) *Enemy {
 	return &Enemy{
 		ID:       uuid.New().String(),
 		Nickname: nickname,
 		Life:     life,
 		Attack:   attack,
-		Defesa:   defesa,
+		Defense:  defense,
+		Heal:     heal, // Inicializando a cura
 	}
 }
+
+// Função para aplicar cura ao inimigo
+func (e *Enemy) ApplyHeal() {
+	e.Life += e.Heal
+}
+

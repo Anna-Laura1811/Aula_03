@@ -27,7 +27,7 @@ func (ph *PlayerHandler) AddPlayer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := ph.PlayerService.AddPlayer(player.Nickname, player.Life, player.Attack, player.Defesa)
+	result, err := ph.PlayerService.AddPlayer(player.Nickname, player.Life, player.Attack, player.Defense, player.Heal)
 	if err != nil {
 		switch {
 		case strings.Contains(err.Error(), "internal server error"):
@@ -65,7 +65,7 @@ func (ph *PlayerHandler) LoadPlayers(w http.ResponseWriter, r *http.Request) {
 func (ph *PlayerHandler) DeletePlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id := r.PathValue("id")
+	id := r.URL.Query().Get("id")
 
 	if err := ph.PlayerService.DeletePlayer(id); err != nil {
 		switch {
@@ -85,7 +85,7 @@ func (ph *PlayerHandler) DeletePlayer(w http.ResponseWriter, r *http.Request) {
 func (ph *PlayerHandler) LoadPlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id := r.PathValue("id")
+	id := r.URL.Query().Get("id")
 
 	player, err := ph.PlayerService.LoadPlayer(id)
 
@@ -107,7 +107,7 @@ func (ph *PlayerHandler) LoadPlayer(w http.ResponseWriter, r *http.Request) {
 func (ph *PlayerHandler) SavePlayer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id := r.PathValue("id")
+	id := r.URL.Query().Get("id")
 
 	var player entity.Player
 	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
@@ -116,7 +116,7 @@ func (ph *PlayerHandler) SavePlayer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := ph.PlayerService.SavePlayer(id, player.Nickname, player.Life, player.Attack, player.Defesa)
+	result, err := ph.PlayerService.SavePlayer(id, player.Nickname, player.Life, player.Attack, player.Defense) // Ajuste para coincidir com a assinatura correta
 	if err != nil {
 		switch {
 		case strings.Contains(err.Error(), "internal server error"):

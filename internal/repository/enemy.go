@@ -16,7 +16,7 @@ func NewEnemyRepository(db *sql.DB) *EnemyRepository {
 }
 
 func (er *EnemyRepository) LoadEnemies() ([]*entity.Enemy, error) {
-	rows, err := er.db.Query("SELECT id, nickname, life, attack, defesa FROM enemy")
+	rows, err := er.db.Query("SELECT id, nickname, life, attack, defesa, heal FROM enemy")
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (er *EnemyRepository) LoadEnemies() ([]*entity.Enemy, error) {
 	var enemies []*entity.Enemy
 	for rows.Next() {
 		var enemy entity.Enemy
-		if err := rows.Scan(&enemy.ID, &enemy.Nickname, &enemy.Life, &enemy.Attack, &enemy.Defesa); err != nil {
+		if err := rows.Scan(&enemy.ID, &enemy.Nickname, &enemy.Life, &enemy.Attack, &enemy.Defense, &enemy.Heal); err != nil {
 			return nil, err
 		}
 		enemies = append(enemies, &enemy)
@@ -35,7 +35,7 @@ func (er *EnemyRepository) LoadEnemies() ([]*entity.Enemy, error) {
 
 func (er *EnemyRepository) LoadEnemyById(id string) (*entity.Enemy, error) {
 	var enemy entity.Enemy
-	err := er.db.QueryRow("SELECT id, nickname, life, attack, defesa FROM enemy WHERE id = $1", id).Scan(&enemy.ID, &enemy.Nickname, &enemy.Life, &enemy.Attack, &enemy.Defesa)
+	err := er.db.QueryRow("SELECT id, nickname, life, attack, defesa, heal FROM enemy WHERE id = $1", id).Scan(&enemy.ID, &enemy.Nickname, &enemy.Life, &enemy.Attack, &enemy.Defense, &enemy.Heal)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -47,7 +47,7 @@ func (er *EnemyRepository) LoadEnemyById(id string) (*entity.Enemy, error) {
 
 func (er *EnemyRepository) LoadEnemyByNickname(nickname string) (*entity.Enemy, error) {
 	var enemy entity.Enemy
-	err := er.db.QueryRow("SELECT id, nickname, life, attack, defesa FROM enemy WHERE nickname LIKE $1", nickname).Scan(&enemy.ID, &enemy.Nickname, &enemy.Life, &enemy.Attack, &enemy.Defesa)
+	err := er.db.QueryRow("SELECT id, nickname, life, attack, defesa, heal FROM enemy WHERE nickname LIKE $1", nickname).Scan(&enemy.ID, &enemy.Nickname, &enemy.Life, &enemy.Attack, &enemy.Defense, &enemy.Heal)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
@@ -58,7 +58,7 @@ func (er *EnemyRepository) LoadEnemyByNickname(nickname string) (*entity.Enemy, 
 }
 
 func (er *EnemyRepository) AddEnemy(enemy *entity.Enemy) (string, error) {
-	_, err := er.db.Exec("INSERT INTO enemy (id, nickname, life, attack, defesa) VALUES ($1, $2, $3, $4, $5)", enemy.ID, enemy.Nickname, enemy.Life, enemy.Attack, enemy.Defesa)
+	_, err := er.db.Exec("INSERT INTO enemy (id, nickname, life, attack, defesa, heal) VALUES ($1, $2, $3, $4, $5, $6)", enemy.ID, enemy.Nickname, enemy.Life, enemy.Attack, enemy.Defense, enemy.Heal)
 	if err != nil {
 		return "", err
 	}
@@ -74,10 +74,9 @@ func (er *EnemyRepository) DeleteEnemyById(id string) error {
 }
 
 func (er *EnemyRepository) SaveEnemy(id string, enemy *entity.Enemy) error {
-	_, err := er.db.Exec("UPDATE enemy SET nickname = $1, life = $2, attack = $3, defesa = $4 WHERE id = $5", enemy.Nickname, enemy.Life, enemy.Attack, enemy.Defesa, id)
+	_, err := er.db.Exec("UPDATE enemy SET nickname = $1, life = $2, attack = $3, defesa = $4, heal = $5 WHERE id = $6", enemy.Nickname, enemy.Life, enemy.Attack, enemy.Defense, enemy.Heal, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-// olhar

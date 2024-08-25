@@ -14,10 +14,8 @@ func NewBattleRepository(db *sql.DB) *BattleRepository {
 }
 
 func (br *BattleRepository) AddBattle(battle *entity.Battle) (string, error) {
-	_, err := br.db.Exec(
-		"INSERT INTO battle (id, playerid, enemyid, playername, enemyname, dicethrown, result) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-		battle.ID, battle.PlayerID, battle.EnemyID, battle.PlayerName, battle.EnemyName, battle.DiceThrown, battle.Result,
-	)
+	_, err := br.db.Exec("INSERT INTO battle (id, playerid, enemyid, playername, enemyname, dicethrown, result) VALUES ($1, $2, $3, $4, $5, $6, $7)",battle.ID, battle.PlayerID, battle.EnemyID, battle.PlayerName, battle.EnemyName, battle.DiceThrown, battle.Result)
+	
 	if err != nil {
 		return "", err
 	}
